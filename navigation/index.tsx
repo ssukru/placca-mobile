@@ -23,7 +23,7 @@ const Nav = () => {
           screenOptions={{
             tabBarActiveTintColor: "#4EE6AA",
             tabBarShowLabel: false,
-            tabBarInactiveTintColor: "#f0f0f0",
+            tabBarInactiveTintColor: "#d5d5d5",
           }}
         >
           <NormalTab.Screen
