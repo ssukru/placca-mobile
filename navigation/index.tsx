@@ -7,6 +7,7 @@ import Welcome from "../screens/Welcome";
 import Home from "../screens/Home";
 import Profile from "../screens/Profile";
 import AddComment from "../screens/AddComment";
+import { Icon } from "react-native-elements";
 
 const Nav = () => {
   const AuthStack = createNativeStackNavigator();
@@ -20,26 +21,65 @@ const Nav = () => {
       {isAuthorized ? (
         <NormalTab.Navigator
           screenOptions={{
-            tabBarStyle: {
-              backgroundColor: "#29339B",
-            },
-            tabBarActiveTintColor: "#FF3A20",
+            tabBarActiveTintColor: "#4EE6AA",
             tabBarShowLabel: false,
-            tabBarInactiveTintColor: "#F1FEC6",
+            tabBarInactiveTintColor: "#f0f0f0",
           }}
         >
           <NormalTab.Screen
             options={{
-              headerRight: () => {
-                // TODO: çöz bunu
-                return <Button title="çıkış yap" onPress={() => signout()} />;
-              },
+              headerShown: false,
+              tabBarIcon: ({ focused, color, size }) => (
+                <Icon
+                  type="ionicon"
+                  name={focused ? "home" : "home-outline"}
+                  size={30}
+                  color={color}
+                />
+              ),
             }}
             name="ana sayfa"
             component={Home}
           />
-          <NormalTab.Screen name="yorum ekle" component={AddComment} />
-          <NormalTab.Screen name="profil" component={Profile} />
+          <NormalTab.Screen
+            options={{
+              headerShown: false,
+              tabBarIcon: ({ focused, color, size }) => (
+                <Icon
+                  type="ionicon"
+                  name={focused ? "add-circle" : "add"}
+                  size={33}
+                  color={color}
+                />
+              ),
+            }}
+            name="yorum ekle"
+            component={AddComment}
+          />
+          <NormalTab.Screen
+            options={{
+              tabBarIcon: ({ focused, color, size }) => (
+                <Icon
+                  type="ionicon"
+                  name={focused ? "person-circle" : "person-circle-outline"}
+                  size={33}
+                  color={color}
+                />
+              ),
+              headerRight: () => {
+                // TODO: çöz bunu
+                return (
+                  <Button
+                    color="#4EE6AA"
+                    title="çıkış yap"
+                    onPress={() => signout()}
+                  />
+                );
+              },
+            }}
+            name="profil"
+            component={Profile}
+          />
         </NormalTab.Navigator>
       ) : (
         <AuthStack.Navigator screenOptions={{ headerShown: false }}>

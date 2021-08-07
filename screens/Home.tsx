@@ -1,11 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 const Home = () => {
   return (
-    <View>
+    <SafeAreaView style={{ backgroundColor: "#f0f0f0" }}>
       <Text>ana sayfa</Text>
-    </View>
+    </SafeAreaView>
   );
 };
 
