@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Button } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAuth } from "../context/auth";
@@ -13,12 +13,22 @@ const Nav = () => {
   const NormalTab = createBottomTabNavigator();
 
   const isAuthorized = useAuth()?.isAuthorized;
+  const signout = useAuth()?.SignOut;
 
   return (
     <>
       {isAuthorized ? (
         <NormalTab.Navigator>
-          <NormalTab.Screen name="ana sayfa" component={Home} />
+          <NormalTab.Screen
+            options={{
+              headerRight: () => {
+                // TODO: çöz bunu
+                return <Button title="çıkış yap" onPress={signout} />;
+              },
+            }}
+            name="ana sayfa"
+            component={Home}
+          />
           <NormalTab.Screen name="yorum ekle" component={AddComment} />
           <NormalTab.Screen name="profil" component={Profile} />
         </NormalTab.Navigator>
