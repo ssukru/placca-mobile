@@ -12,13 +12,11 @@ import { Icon } from "react-native-elements";
 const Nav = () => {
   const AuthStack = createNativeStackNavigator();
   const NormalTab = createBottomTabNavigator();
-
-  const isAuthorized = useAuth()?.isAuthorized;
-  const signout = useAuth()?.SignOut;
+  const auth = useAuth();
 
   return (
     <>
-      {isAuthorized ? (
+      {auth?.isAuthorized ? (
         <NormalTab.Navigator
           screenOptions={{
             tabBarActiveTintColor: "#4EE6AA",
@@ -66,13 +64,21 @@ const Nav = () => {
                   color={color}
                 />
               ),
-              headerRight: () => {
-                // TODO: çöz bunu
+              headerLeft: () => {
                 return (
                   <Button
-                    color="#4EE6AA"
+                    color="#159965"
                     title="çıkış yap"
-                    onPress={() => signout()}
+                    onPress={() => auth.SignOut()}
+                  />
+                );
+              },
+              headerRight: () => {
+                return (
+                  <Button
+                    color="#ddd"
+                    title="düzenle"
+                    onPress={() => alert("bi olayı yok su an")}
                   />
                 );
               },

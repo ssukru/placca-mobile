@@ -2,11 +2,9 @@ import React from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 
 import Input from "../components/input";
@@ -27,17 +25,18 @@ const AddComment = () => {
           placeholder="plaka"
           value={plaka}
           onChangeText={setPlaka}
+          returnButtonType="done"
+          onSubmit={() => {}}
         />
         <Input
           placeholder="yorum"
           isMultiline
           value={yorum}
           onChangeText={setYorum}
+          returnButtonType="send"
+          onSubmit={() => {}}
         />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => console.log(yorum)}
-        >
+        <TouchableOpacity style={styles.button} onPress={() => {}}>
           <Text style={styles.buttonText}>gönder</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>

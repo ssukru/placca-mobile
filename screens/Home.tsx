@@ -19,26 +19,30 @@ const Home = () => {
         value={plaka}
         onChangeText={setPlaka}
         isMultiline={false}
+        returnButtonType="send"
+        onSubmit={() => alert(plaka)}
       />
       <View style={{ width: "100%" }}>
-        <Text>son eklenen yorumlar</Text>
+        <Text style={{ marginTop: 12, marginBottom: 4, color: "#159965" }}>
+          son eklenen yorumlar
+        </Text>
         <Comment
           onPress={Redirect}
           plaka="48AGB465"
           yorumcu="ŞÜKRÜ ÜNAL"
-          yorum="alet nalet"
+          yorum="ne kadar duyarlı bir sürücü 🥰"
         />
         <Comment
           onPress={Redirect}
           plaka="15HC959"
           yorumcu="ŞÜKRÜ ÜNAL"
-          yorum="alet nalet"
+          yorum="araba yavaş gidiyo sanki biraz?"
         />
         <Comment
           onPress={Redirect}
           plaka="15HK848"
           yorumcu="ŞABAN ÜNAL"
-          yorum="TERBİYESİZ"
+          yorum="burası neresi"
         />
       </View>
     </Container>

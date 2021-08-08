@@ -11,16 +11,28 @@ type Yorum = {
 const Comment = ({ plaka, yorumcu, yorum, onPress }: Yorum) => {
   return (
     <TouchableOpacity style={styles.yorumBackground} onPress={onPress}>
-      <Text style={{ fontSize: 18, fontWeight: "500", color: "#FF4C29" }}>
-        {plaka}
-      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>
+          {yorumcu}
+        </Text>
+        <Text style={{ color: "#159965", fontWeight: "500" }}>@{plaka}</Text>
+      </View>
+
       <Text
         style={{
           marginTop: 6,
-          fontSize: 16,
+          fontSize: 14,
+          fontStyle: "italic",
+          color: "#333",
         }}
       >
-        {yorumcu}: {yorum}
+        {yorum}
       </Text>
     </TouchableOpacity>
   );
