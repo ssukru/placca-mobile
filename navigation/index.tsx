@@ -8,11 +8,88 @@ import Home from "../screens/Home";
 import Profile from "../screens/Profile";
 import AddComment from "../screens/AddComment";
 import { Icon } from "react-native-elements";
+import Plate from "../screens/Plate";
+
+export type HomeStackParams = {
+  AnaSayfaStack: undefined;
+  PlakaDetay: undefined;
+};
+
+export type ProfileStackParams = {
+  ProfilStack: undefined;
+  PlakaDetay: undefined;
+};
 
 const Nav = () => {
   const AuthStack = createNativeStackNavigator();
   const NormalTab = createBottomTabNavigator();
+  const HomeStack = createNativeStackNavigator<HomeStackParams>();
+  const ProfileStack = createNativeStackNavigator<ProfileStackParams>();
+
   const auth = useAuth();
+
+  const HomeScreens = () => {
+    return (
+      <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+        <HomeStack.Screen
+          options={{ title: "ana sayfa" }}
+          name="AnaSayfaStack"
+          component={Home}
+        />
+        <HomeStack.Screen
+          options={{
+            headerShown: true,
+            title: "plaka detay",
+            headerTintColor: "#159965",
+            headerBackTitle: "ana sayfa",
+          }}
+          name="PlakaDetay"
+          component={Plate}
+        />
+      </HomeStack.Navigator>
+    );
+  };
+
+  const ProfileScreens = () => {
+    return (
+      <ProfileStack.Navigator>
+        <ProfileStack.Screen
+          options={{
+            title: "profil",
+            headerLeft: () => {
+              return (
+                <Button
+                  color="#159965"
+                  title="çıkış yap"
+                  onPress={() => auth?.SignOut()}
+                />
+              );
+            },
+            headerRight: () => {
+              return (
+                <Button
+                  color="#ddd"
+                  title="düzenle"
+                  onPress={() => alert("bi olayı yok su an")}
+                />
+              );
+            },
+          }}
+          name="ProfilStack"
+          component={Profile}
+        />
+        <ProfileStack.Screen
+          name="PlakaDetay"
+          options={{
+            title: "plaka detay",
+            headerShown: true,
+            headerTintColor: "#159965",
+          }}
+          component={Plate}
+        />
+      </ProfileStack.Navigator>
+    );
+  };
 
   return (
     <>
@@ -22,11 +99,11 @@ const Nav = () => {
             tabBarActiveTintColor: "#4EE6AA",
             tabBarShowLabel: false,
             tabBarInactiveTintColor: "#d5d5d5",
+            headerShown: false,
           }}
         >
           <NormalTab.Screen
             options={{
-              headerShown: false,
               tabBarIcon: ({ focused, color, size }) => (
                 <Icon
                   type="ionicon"
@@ -37,7 +114,7 @@ const Nav = () => {
               ),
             }}
             name="ana sayfa"
-            component={Home}
+            component={HomeScreens}
           />
           <NormalTab.Screen
             options={{
@@ -64,27 +141,9 @@ const Nav = () => {
                   color={color}
                 />
               ),
-              headerLeft: () => {
-                return (
-                  <Button
-                    color="#159965"
-                    title="çıkış yap"
-                    onPress={() => auth.SignOut()}
-                  />
-                );
-              },
-              headerRight: () => {
-                return (
-                  <Button
-                    color="#ddd"
-                    title="düzenle"
-                    onPress={() => alert("bi olayı yok su an")}
-                  />
-                );
-              },
             }}
             name="profil"
-            component={Profile}
+            component={ProfileScreens}
           />
         </NormalTab.Navigator>
       ) : (

@@ -1,7 +1,9 @@
 import React from "react";
-import { Button, FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import Comment from "../components/comment";
 import { ContainerWithoutSafeArea } from "../components/container";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ProfileStackParams } from "../navigation";
 
 const Redirect = () => {
   return;
@@ -24,7 +26,16 @@ const data = [
   },
 ];
 
-const Profile = () => {
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  ProfileStackParams,
+  "ProfilStack"
+>;
+
+type Props = {
+  navigation: ProfileScreenNavigationProp;
+};
+
+const Profile = ({ navigation }: Props) => {
   return (
     <ContainerWithoutSafeArea>
       <View style={{ width: "100%", height: "100%" }}>
@@ -40,11 +51,12 @@ const Profile = () => {
         </View>
         <Text>2 adet yorum bulundu:</Text>
         <FlatList
+          style={{ height: "100%", width: "100%", paddingHorizontal: 1 }}
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Comment
-              onPress={item.onPress}
+              onPress={() => navigation.navigate("PlakaDetay")}
               yorum={item.yorum}
               yorumcu={item.yorumcu}
               plaka={item.plaka}

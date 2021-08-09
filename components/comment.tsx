@@ -8,6 +8,11 @@ type Yorum = {
   onPress: () => void;
 };
 
+type YorumNoTouch = {
+  yorumcu: string;
+  yorum: string;
+};
+
 const Comment = ({ plaka, yorumcu, yorum, onPress }: Yorum) => {
   return (
     <TouchableOpacity style={styles.yorumBackground} onPress={onPress}>
@@ -25,6 +30,7 @@ const Comment = ({ plaka, yorumcu, yorum, onPress }: Yorum) => {
       </View>
 
       <Text
+        numberOfLines={4}
         style={{
           marginTop: 6,
           fontSize: 14,
@@ -39,6 +45,35 @@ const Comment = ({ plaka, yorumcu, yorum, onPress }: Yorum) => {
 };
 
 export default Comment;
+
+export const CommentNoTouch = ({ yorum, yorumcu }: YorumNoTouch) => {
+  return (
+    <View style={styles.yorumBackground}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>
+          {yorumcu}
+        </Text>
+      </View>
+
+      <Text
+        style={{
+          marginTop: 6,
+          fontSize: 14,
+          fontStyle: "italic",
+          color: "#333",
+        }}
+      >
+        {yorum}
+      </Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   yorumBackground: {
