@@ -49,7 +49,9 @@ const Profile = ({ navigation }: Props) => {
             <Text style={{ marginTop: 2 }}>Denizli</Text>
           </View>
         </View>
-        <Text>2 adet yorum bulundu:</Text>
+        <Text style={{ marginBottom: 4, color: "#159965" }}>
+          2 adet yorum bulundu:
+        </Text>
         <FlatList
           style={{ height: "100%", width: "100%", paddingHorizontal: 1 }}
           data={data}
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
   head: {
     width: "100%",
     flexDirection: "row",
-    marginBottom: 24,
+    marginBottom: 16,
   },
   text: {
     fontSize: 16,
