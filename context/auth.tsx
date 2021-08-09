@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { createContext } from "react";
+import React, { createContext } from "react";
 
 type User = {
   name: string;
@@ -10,7 +10,7 @@ type User = {
 type Auth = {
   user: User | null;
   SignIn: (user: User) => boolean;
-  SignOut: () => boolean;
+  SignOut: () => void;
   isAuthorized: boolean;
 };
 
@@ -26,16 +26,14 @@ const ProvideAuth = (): Auth => {
     if (user) {
       setUser(user);
       setAuthorized(true);
-    } else {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   };
 
-  const SignOut = (): boolean => {
+  const SignOut = (): void => {
     setUser(null);
     setAuthorized(false);
-    return true;
   };
 
   return {
