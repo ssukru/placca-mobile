@@ -51,6 +51,7 @@ const Home = ({ navigation }: Props) => {
   return (
     <Container>
       <Input
+        capitalize
         placeholder="plaka ara"
         value={plaka}
         onChangeText={setPlaka}

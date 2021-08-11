@@ -12,24 +12,29 @@ import { useAuth } from "../context/auth";
 const Welcome: React.FC = () => {
   const auth = useAuth();
 
-  const user = {
-    name: "Şükrü Ünal",
-    nickname: "sukru",
-    photoUrl: "test.com/photo.png",
-  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>plaka app</Text>
-        <Text style={styles.subTitle}>trafikteki araçlara yorum yap!</Text>
-        <TouchableOpacity
-          onPress={() => {
-            auth?.SignIn(user);
-          }}
-          style={styles.signinButton}
-        >
-          <Text style={styles.signinButtonText}>giriş yap</Text>
-        </TouchableOpacity>
+        <View style={styles.titleWrapper}>
+          <Text style={styles.title}>plaka app</Text>
+          <Text style={styles.subTitle}>trafikteki araçlara yorum yap!</Text>
+        </View>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              auth?.SignIn();
+            }}
+            style={styles.signinButton}
+          >
+            <Text style={styles.signinButtonText}>giriş yap</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => auth?.SignInAnonymous()}>
+            <Text style={styles.anonimText}>
+              veya anonim olarak{" "}
+              <Text style={{ fontWeight: "bold" }}>devam et.</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -44,9 +49,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     height: "100%",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    paddingVertical: 32,
+    paddingVertical: 4,
   },
   title: {
     fontSize: 48,
@@ -58,17 +61,32 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "300",
     color: "#159965",
-    marginBottom: 12,
+    marginBottom: 36,
   },
   signinButton: {
     backgroundColor: "#FF4C29",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 6,
+    marginBottom: 4,
+    alignItems: "center",
   },
   signinButtonText: {
     color: "#fff",
     fontSize: 24,
     fontWeight: "300",
+  },
+  anonimText: {
+    color: "#666",
+    fontSize: 16,
+    fontWeight: "500",
+    paddingVertical: 6,
+    textAlign: "center",
+  },
+  titleWrapper: {
+    width: "100%",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

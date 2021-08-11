@@ -15,6 +15,7 @@ type Props = {
   onChangeText: (text: string) => void;
   onSubmit: () => void;
   returnButtonType: ReturnKeyTypeOptions;
+  capitalize: boolean;
 };
 
 const Input = ({
@@ -24,6 +25,7 @@ const Input = ({
   onChangeText,
   onSubmit,
   returnButtonType,
+  capitalize,
 }: Props) => {
   return (
     <LinearGradient colors={["#f7f7f7", "#ffffff"]} style={styles.input}>
@@ -32,7 +34,7 @@ const Input = ({
         placeholder={placeholder}
         value={value}
         onChangeText={(text) => onChangeText(text)}
-        autoCapitalize="characters"
+        autoCapitalize={capitalize ? "characters" : "none"}
         style={{ width: "100%", padding: 12, paddingTop: 12 }}
         onSubmitEditing={returnButtonType === "send" ? onSubmit : () => {}}
         returnKeyType={returnButtonType}
