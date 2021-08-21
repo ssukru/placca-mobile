@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-picker/picker": "1.16.1",
     "@react-navigation/bottom-tabs": "^6.0.1",
     "@react-navigation/native": "^6.0.1",
     "@react-navigation/native-stack": "^6.0.1",

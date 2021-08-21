@@ -1,21 +1,16 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { Alert, KeyboardAvoidingView, Platform } from "react-native";
 
 import Input from "../components/input";
 import Container from "../components/container";
 import { firestore } from "../utils/firebase";
 import { useAuth } from "../context/auth";
+import { Button } from "../components/button";
 
 const AddComment = () => {
   const [plaka, setPlaka] = useState<string>("");
   const [yorum, setYorum] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const auth = useAuth();
 
@@ -36,19 +31,62 @@ const AddComment = () => {
       );
       return;
     }
+    setLoading(true);
     firestore()
-      .collection("plakalar")
+      .collection("plates")
       .doc(plaka.toLowerCase())
-      .set(
-        {
-          yorumlar: firestore.FieldValue.arrayUnion({
-            yorum: yorum,
-            yorumcu: auth?.user,
-            time: firestore.Timestamp.now(),
-          }),
-        },
-        { merge: true }
-      );
+      .collection("comments")
+      .add({
+        comment: yorum,
+        commenterName: auth?.user?.name,
+        commenterUid: auth?.user?.uid,
+        plate: plaka,
+        time: firestore.Timestamp.now(),
+        isAnonymous: auth?.user?.isAnonymous,
+      })
+      .then((result) => {
+        firestore()
+          .collection("plates")
+          .doc(plaka.toLowerCase())
+          .set(
+            {
+              commentCount: firestore.FieldValue.increment(1),
+            },
+            { merge: true }
+          )
+          .then(() => {
+            if (!auth?.user?.isAnonymous) {
+              firestore()
+                .collection("users")
+                .doc(auth?.user?.uid)
+                .set(
+                  {
+                    addedCommentsCount: firestore.FieldValue.increment(1),
+                  },
+                  { merge: true }
+                )
+                .then((result) => {
+                  alert("yorumunuz başarıyla gönderildi.");
+                  setPlaka("");
+                  setYorum("");
+                  setLoading(false);
+                });
+            } else {
+              alert("yorumunuz başarıyla gönderildi.");
+              setPlaka("");
+              setYorum("");
+              setLoading(false);
+            }
+          })
+          .catch((error) => {
+            alert(error);
+            setLoading(false);
+          });
+      })
+      .catch((error) => {
+        alert(error);
+        setLoading(false);
+      });
 
     return;
   };
@@ -77,28 +115,10 @@ const AddComment = () => {
           returnButtonType="send"
           onSubmit={handleSubmit}
         />
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>gönder</Text>
-        </TouchableOpacity>
+        <Button text="gönder" onPress={handleSubmit} loading={loading} />
       </KeyboardAvoidingView>
     </Container>
   );
 };
 
 export default AddComment;
-
-const styles = StyleSheet.create({
-  button: {
-    width: "100%",
-    borderRadius: 6,
-    padding: 12,
-    marginBottom: 12,
-    backgroundColor: "#FF4C29",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "300",
-  },
-});

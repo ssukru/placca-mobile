@@ -1,11 +1,18 @@
-import React from "react";
-import { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Container from "../components/container";
 import Input from "../components/input";
 import Comment from "../components/comment";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParams } from "../navigation";
+import { firestore } from "../utils/firebase";
+import { useAuth } from "../context/auth";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParams,
@@ -16,37 +23,60 @@ type Props = {
   navigation: HomeScreenNavigationProp;
 };
 
+type MyComment = {
+  commentId: string;
+  comment: string;
+  commenterName: string;
+  commenterUid: string;
+  plate: string;
+  time: string;
+  isAnonymous: boolean;
+};
+
 const Home = ({ navigation }: Props) => {
   const [plaka, setPlaka] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [comments, setComments] = useState<Array<MyComment>>([]);
 
-  const Redirect = () => {
-    return;
+  const auth = useAuth();
+
+  useEffect((): (() => void) => {
+    let mounted = true;
+
+    if (mounted && !auth?.authLoading) {
+      firestore()
+        .collectionGroup("comments")
+        .limit(10)
+        .orderBy("time", "desc")
+        .onSnapshot((result) => {
+          if (result.size > 0) {
+            let tempComments: Array<MyComment> = [];
+            result.forEach((doc) => {
+              tempComments.push({
+                commentId: doc.id,
+                comment: doc.data().comment,
+                commenterName: doc.data().commenterName,
+                commenterUid: doc.data().commenterUid,
+                plate: doc.data().plate,
+                time: doc.data().time.toString(),
+                isAnonymous: doc.data().isAnonymous,
+              });
+            });
+            setComments(tempComments);
+            setLoading(false);
+          }
+        });
+    }
+
+    return () => (mounted = false);
+  }, []);
+
+  const Search = () => {
+    navigation.navigate("PlakaDetay", {
+      plate: plaka.toUpperCase(),
+    });
+    setPlaka("");
   };
-
-  const data = [
-    {
-      id: "1",
-      onPress: Redirect,
-      plaka: "48AGB465",
-      yorumcu: "ŞÜKRÜ ÜNAL",
-      yorum:
-        "ne kadar duyarlı bir sürücü 🥰 ne kadar duyarlı bir sürücü 🥰 ne kadar duyarlı bir sürücü 🥰",
-    },
-    {
-      id: "2",
-      onPress: Redirect,
-      plaka: "15HC959",
-      yorumcu: "ŞÜKRÜ ÜNAL",
-      yorum: "araba yavaş gidiyo sanki biraz?",
-    },
-    {
-      id: "3",
-      onPress: Redirect,
-      plaka: "15HK848",
-      yorumcu: "ŞABAN ÜNAL",
-      yorum: "burası neresi",
-    },
-  ];
 
   return (
     <Container>
@@ -57,25 +87,31 @@ const Home = ({ navigation }: Props) => {
         onChangeText={setPlaka}
         isMultiline={false}
         returnButtonType="send"
-        onSubmit={() => alert(plaka)}
+        onSubmit={Search}
       />
       <View style={{ width: "100%" }}>
-        <Text style={{ marginTop: 8, marginBottom: 4, color: "#159965" }}>
-          son eklenen yorumlar
-        </Text>
-        <FlatList
-          style={{ height: "100%", width: "100%", paddingHorizontal: 1 }}
-          data={data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Comment
-              onPress={() => navigation.navigate("PlakaDetay")}
-              yorum={item.yorum}
-              yorumcu={item.yorumcu}
-              plaka={item.plaka}
-            />
-          )}
-        />
+        <Text style={styles.commentCount}>son eklenen yorumlar</Text>
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <FlatList
+            style={styles.flatList}
+            data={comments}
+            keyExtractor={(item) => item.commentId}
+            renderItem={({ item }) => (
+              <Comment
+                onPress={() =>
+                  navigation.navigate("PlakaDetay", {
+                    plate: item.plate,
+                  })
+                }
+                yorum={item.comment}
+                yorumcu={item.commenterName}
+                plaka={item.plate}
+              />
+            )}
+          />
+        )}
       </View>
     </Container>
   );
@@ -83,4 +119,15 @@ const Home = ({ navigation }: Props) => {
 
 export default Home;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  commentCount: {
+    marginTop: 8,
+    marginBottom: 4,
+    color: "#4EE6AA",
+  },
+  flatList: {
+    height: "100%",
+    width: "100%",
+    paddingHorizontal: 1,
+  },
+});

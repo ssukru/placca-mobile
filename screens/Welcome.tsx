@@ -1,39 +1,59 @@
-import { LinearGradient } from "expo-linear-gradient";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React from "react";
 import {
+  ActivityIndicator,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Button, TextButton } from "../components/button";
 import { useAuth } from "../context/auth";
+import { AuthStackParams } from "../navigation";
 
-const Welcome: React.FC = () => {
+type WelcomeScreenNavigationProp = NativeStackNavigationProp<
+  AuthStackParams,
+  "Welcome"
+>;
+
+type Props = {
+  navigation: WelcomeScreenNavigationProp;
+};
+
+const Welcome = ({ navigation }: Props) => {
   const auth = useAuth();
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.titleWrapper}>
-          <Text style={styles.title}>plaka app</Text>
+          <Text style={styles.title}>placca</Text>
           <Text style={styles.subTitle}>trafikteki araçlara yorum yap!</Text>
         </View>
-        <View>
-          <TouchableOpacity
-            onPress={() => {
-              auth?.SignIn();
-            }}
-            style={styles.signinButton}
-          >
-            <Text style={styles.signinButtonText}>giriş yap</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => auth?.SignInAnonymous()}>
-            <Text style={styles.anonimText}>
-              veya anonim olarak{" "}
-              <Text style={{ fontWeight: "bold" }}>devam et.</Text>
-            </Text>
-          </TouchableOpacity>
+        <View style={{}}>
+          {auth?.authLoading ? (
+            <>
+              <ActivityIndicator />
+            </>
+          ) : (
+            <>
+              <Button
+                text="giriş yap"
+                onPress={() => navigation.navigate("Login")}
+              />
+              <Button
+                text="kayıt ol"
+                onPress={() => navigation.navigate("Register")}
+                additionalViewStyle={{ backgroundColor: "#4EE6AA" }}
+              />
+              <TextButton
+                text="veya anonim olarak"
+                boldText=" devam et."
+                onPress={() => auth?.SignInAnonymous()}
+              />
+            </>
+          )}
         </View>
       </View>
     </SafeAreaView>
