@@ -9,19 +9,28 @@ import Profile from "../screens/Profile";
 import AddComment from "../screens/AddComment";
 import { Icon } from "react-native-elements";
 import Plate from "../screens/Plate";
+import Register from "../screens/Register";
+import Login from "../screens/Login";
 
 export type HomeStackParams = {
   AnaSayfaStack: undefined;
-  PlakaDetay: undefined;
+  PlakaDetay: { plate: string };
 };
 
 export type ProfileStackParams = {
   ProfilStack: undefined;
-  PlakaDetay: undefined;
+  PlakaDetay: { plate: string };
+  Kayit: undefined;
+};
+
+export type AuthStackParams = {
+  Welcome: undefined;
+  Register: undefined;
+  Login: undefined;
 };
 
 const Nav = () => {
-  const AuthStack = createNativeStackNavigator();
+  const AuthStack = createNativeStackNavigator<AuthStackParams>();
   const NormalTab = createBottomTabNavigator();
   const HomeStack = createNativeStackNavigator<HomeStackParams>();
   const ProfileStack = createNativeStackNavigator<ProfileStackParams>();
@@ -40,7 +49,10 @@ const Nav = () => {
           options={{
             headerShown: true,
             title: "plaka detay",
-            headerTintColor: "#159965",
+            headerTintColor: "#4EE6AA",
+            headerTitleStyle: {
+              color: "#000",
+            },
             headerBackTitle: "ana sayfa",
           }}
           name="PlakaDetay"
@@ -51,6 +63,8 @@ const Nav = () => {
   };
 
   const ProfileScreens = () => {
+    const auth = useAuth();
+
     return (
       <ProfileStack.Navigator>
         <ProfileStack.Screen
@@ -59,7 +73,7 @@ const Nav = () => {
             headerLeft: () => {
               return (
                 <Button
-                  color="#159965"
+                  color="#4EE6AA"
                   title="çıkış yap"
                   onPress={() => auth?.SignOut()}
                 />
@@ -68,9 +82,15 @@ const Nav = () => {
             headerRight: () => {
               return (
                 <Button
-                  color="#ddd"
+                  color={auth?.user?.isAnonymous ? "#ddd" : "#4EE6AA"}
                   title="düzenle"
-                  onPress={() => alert("bi olayı yok su an")}
+                  onPress={() => {
+                    if (auth?.user?.isAnonymous) {
+                      alert("önce gerçek bir profil oluşturmalısın");
+                    } else {
+                      alert("bi olayı yok şu an");
+                    }
+                  }}
                 />
               );
             },
@@ -83,76 +103,118 @@ const Nav = () => {
           options={{
             title: "plaka detay",
             headerShown: true,
-            headerTintColor: "#159965",
+            headerTintColor: "#4EE6AA",
           }}
           component={Plate}
+        />
+        <ProfileStack.Screen
+          name="Kayit"
+          options={{
+            title: "kayıt ol",
+            headerBackTitle: "profil",
+            headerTintColor: "#4EE6AA",
+            headerTitleStyle: {
+              color: "#000",
+            },
+            headerShown: true,
+          }}
+          component={Register}
         />
       </ProfileStack.Navigator>
     );
   };
 
-  return (
-    <>
-      {auth?.isAuthorized ? (
-        <NormalTab.Navigator
-          screenOptions={{
-            tabBarActiveTintColor: "#4EE6AA",
-            tabBarShowLabel: false,
-            tabBarInactiveTintColor: "#d5d5d5",
-            headerShown: false,
+  if (auth?.isAuthorized) {
+    return (
+      <NormalTab.Navigator
+        screenOptions={{
+          tabBarActiveTintColor: "#4EE6AA",
+          tabBarShowLabel: false,
+          tabBarInactiveTintColor: "#d5d5d5",
+          headerShown: false,
+        }}
+        initialRouteName="ana sayfa"
+      >
+        <NormalTab.Screen
+          options={{
+            tabBarIcon: ({ focused, color, size }) => (
+              <Icon
+                type="ionicon"
+                name={focused ? "home" : "home-outline"}
+                size={30}
+                color={color}
+              />
+            ),
           }}
-        >
-          <NormalTab.Screen
-            options={{
-              tabBarIcon: ({ focused, color, size }) => (
-                <Icon
-                  type="ionicon"
-                  name={focused ? "home" : "home-outline"}
-                  size={30}
-                  color={color}
-                />
-              ),
-            }}
-            name="ana sayfa"
-            component={HomeScreens}
-          />
-          <NormalTab.Screen
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ focused, color, size }) => (
-                <Icon
-                  type="ionicon"
-                  name={focused ? "add-circle" : "add"}
-                  size={33}
-                  color={color}
-                />
-              ),
-            }}
-            name="yorum ekle"
-            component={AddComment}
-          />
-          <NormalTab.Screen
-            options={{
-              tabBarIcon: ({ focused, color, size }) => (
-                <Icon
-                  type="ionicon"
-                  name={focused ? "person-circle" : "person-circle-outline"}
-                  size={33}
-                  color={color}
-                />
-              ),
-            }}
-            name="profil"
-            component={ProfileScreens}
-          />
-        </NormalTab.Navigator>
-      ) : (
-        <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-          <AuthStack.Screen name="welcome" component={Welcome} />
-        </AuthStack.Navigator>
-      )}
-    </>
-  );
+          name="ana sayfa"
+          component={HomeScreens}
+        />
+        <NormalTab.Screen
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ focused, color, size }) => (
+              <Icon
+                type="ionicon"
+                name={focused ? "add-circle" : "add"}
+                size={33}
+                color={color}
+              />
+            ),
+          }}
+          name="yorum ekle"
+          component={AddComment}
+        />
+        <NormalTab.Screen
+          options={{
+            tabBarIcon: ({ focused, color, size }) => (
+              <Icon
+                type="ionicon"
+                name={focused ? "person-circle" : "person-circle-outline"}
+                size={33}
+                color={color}
+              />
+            ),
+          }}
+          name="profil"
+          component={ProfileScreens}
+        />
+      </NormalTab.Navigator>
+    );
+  } else {
+    return (
+      <AuthStack.Navigator screenOptions={{ headerShown: true }}>
+        <AuthStack.Screen
+          name="Welcome"
+          options={{ headerShown: false }}
+          component={Welcome}
+        />
+        <AuthStack.Screen
+          name="Register"
+          options={{
+            headerBackTitle: "geri",
+            headerTintColor: "#4EE6AA",
+            headerTitleStyle: {
+              color: "#000",
+            },
+            title: "kayıt ol",
+          }}
+          component={Register}
+        />
+        <AuthStack.Screen
+          name="Login"
+          options={{
+            headerBackTitle: "geri",
+            headerTintColor: "#4EE6AA",
+            headerTitleStyle: {
+              color: "#000",
+            },
+            title: "giriş",
+          }}
+          component={Login}
+        />
+      </AuthStack.Navigator>
+    );
+  }
 };
 
 export default Nav;
