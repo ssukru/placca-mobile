@@ -44,10 +44,10 @@ const ProvideAuth = (): Auth => {
 
   const SignInAnonymous = async () => {
     setLoading(true);
-    firebaseAuth().signInAnonymously();
+    await firebaseAuth().signInAnonymously();
   };
 
-  const LinkAnonymousAccountWithEmail = (
+  const LinkAnonymousAccountWithEmail = async (
     email: string,
     pw: string,
     name: string,
@@ -55,102 +55,83 @@ const ProvideAuth = (): Auth => {
     linkComments: boolean
   ) => {
     setLoading(true);
-    const credential = firebaseAuth.EmailAuthProvider.credential(email, pw);
-    firebaseAuth()
-      .currentUser?.linkWithCredential(credential)
-      .then((usercred) => {
-        if (linkComments) {
-          firestore()
-            .collectionGroup("comments")
-            .where("commenterUid", "==", usercred.user?.uid)
-            .get()
-            .then((result) => {
-              if (result.size > 0) {
-                result.forEach((doc) => {
-                  doc.ref.update({
-                    commenterName: name,
-                    isAnonymous: false,
-                  });
-                });
-              }
-              firestore()
-                .collection("users")
-                .doc(usercred.user?.uid)
-                .set({
-                  name: name,
-                  city: city,
-                  email: email,
-                  addedCommentsCount: result.size,
-                  photoUrl: "",
-                })
-                .then(() => {
-                  alert(
-                    "hesabınız başarıyla oluşturuldu. lütfen tekrar giriş yapın."
-                  );
-                  SignOut();
-                })
-                .catch((error) => console.log(error));
-            })
-            .catch((error) => console.log(error));
-        } else {
-          firestore()
-            .collection("users")
-            .doc(usercred.user?.uid)
-            .set({
-              name: name,
-              city: city,
-              email: email,
-              addedCommentsCount: 0,
-              photoUrl: "",
-            })
-            .then(() => {
-              alert(
-                "hesabınız başarıyla oluşturuldu. lütfen tekrar giriş yapın."
-              );
-              SignOut();
-            })
-            .catch((error) => console.log(error));
+    try {
+      const credential = firebaseAuth.EmailAuthProvider.credential(email, pw);
+      const userCred = await firebaseAuth().currentUser?.linkWithCredential(
+        credential
+      );
+
+      if (linkComments) {
+        const result = await firestore()
+          .collectionGroup("comments")
+          .where("commenterUid", "==", userCred?.user?.uid)
+          .get();
+        if (result.size > 0) {
+          result.forEach((doc) => {
+            doc.ref.update({
+              commenterName: name,
+              isAnonymous: false,
+            });
+          });
         }
-      })
-      .catch((error) => console.log(error));
+        await firestore().collection("users").doc(userCred?.user?.uid).set({
+          name: name,
+          city: city,
+          email: email,
+          addedCommentsCount: result.size,
+          photoUrl: "",
+        });
+        alert("hesabınız başarıyla oluşturuldu. lütfen tekrar giriş yapın.");
+        await SignOut();
+      } else {
+        await firestore().collection("users").doc(userCred?.user?.uid).set({
+          name: name,
+          city: city,
+          email: email,
+          addedCommentsCount: 0,
+          photoUrl: "",
+        });
+        alert("hesabınız başarıyla oluşturuldu. lütfen tekrar giriş yapın.");
+        await SignOut();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const RegisterWithEmail = (
+  const RegisterWithEmail = async (
     email: string,
     pw: string,
     name: string,
     city: string
   ) => {
     setLoading(true);
-    firebaseAuth()
-      .createUserWithEmailAndPassword(email, pw)
-      .then((usercred) => {
-        firestore()
-          .collection("users")
-          .doc(usercred.user?.uid)
-          .set({
-            name: name,
-            city: city,
-            email: email,
-            addedCommentsCount: 0,
-            photoUrl: "",
-          })
-          .then(() => {
-            alert("hesabınız başarıyla oluşturuldu.");
-          })
-          .catch((error) => console.log(error));
-      })
-      .catch((error) => console.log(error));
+    try {
+      const userCred = await firebaseAuth().createUserWithEmailAndPassword(
+        email,
+        pw
+      );
+      await firestore().collection("users").doc(userCred.user?.uid).set({
+        name: name,
+        city: city,
+        email: email,
+        addedCommentsCount: 0,
+        photoUrl: "",
+      });
+      alert("hesabınız başarıyla oluşturuldu.");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const SignIn = async (email: string, pw: string) => {
     setLoading(true);
-    firebaseAuth().signInWithEmailAndPassword(email, pw);
+    await firebaseAuth().signInWithEmailAndPassword(email, pw);
   };
 
-  const SignOut = (): void => {
+  const SignOut = async () => {
     setLoading(true);
-    firebaseAuth().signOut();
+    await firebaseAuth().signOut();
   };
 
   React.useEffect((): firebase.Unsubscribe => {
@@ -174,7 +155,7 @@ const ProvideAuth = (): Auth => {
             });
         } else {
           setUserInfo({
-            name: `anon-${user?.uid}`,
+            name: "Anonim",
             uid: user?.uid,
             photoUrl: "",
             isAnonymous: user?.isAnonymous,

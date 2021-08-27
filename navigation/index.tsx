@@ -1,16 +1,18 @@
 import React from "react";
 import { Button } from "react-native";
+import { Icon } from "react-native-elements";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAuth } from "../context/auth";
-import Welcome from "../screens/Welcome";
-import Home from "../screens/Home";
-import Profile from "../screens/Profile";
-import AddComment from "../screens/AddComment";
-import { Icon } from "react-native-elements";
-import Plate from "../screens/Plate";
-import Register from "../screens/Register";
-import Login from "../screens/Login";
+import {
+  Welcome,
+  Home,
+  Profile,
+  AddComment,
+  Plate,
+  Register,
+  Login,
+} from "../screens";
 
 export type HomeStackParams = {
   AnaSayfaStack: undefined;
@@ -29,38 +31,13 @@ export type AuthStackParams = {
   Login: undefined;
 };
 
+const AuthStack = createNativeStackNavigator<AuthStackParams>();
+const NormalTab = createBottomTabNavigator();
+const HomeStack = createNativeStackNavigator<HomeStackParams>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParams>();
+
 const Nav = () => {
-  const AuthStack = createNativeStackNavigator<AuthStackParams>();
-  const NormalTab = createBottomTabNavigator();
-  const HomeStack = createNativeStackNavigator<HomeStackParams>();
-  const ProfileStack = createNativeStackNavigator<ProfileStackParams>();
-
   const auth = useAuth();
-
-  const HomeScreens = () => {
-    return (
-      <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-        <HomeStack.Screen
-          options={{ title: "ana sayfa" }}
-          name="AnaSayfaStack"
-          component={Home}
-        />
-        <HomeStack.Screen
-          options={{
-            headerShown: true,
-            title: "plaka detay",
-            headerTintColor: "#4EE6AA",
-            headerTitleStyle: {
-              color: "#000",
-            },
-            headerBackTitle: "ana sayfa",
-          }}
-          name="PlakaDetay"
-          component={Plate}
-        />
-      </HomeStack.Navigator>
-    );
-  };
 
   const ProfileScreens = () => {
     const auth = useAuth();
@@ -124,6 +101,31 @@ const Nav = () => {
     );
   };
 
+  const HomeScreens = () => {
+    return (
+      <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+        <HomeStack.Screen
+          options={{ title: "ana sayfa" }}
+          name="AnaSayfaStack"
+          component={Home}
+        />
+        <HomeStack.Screen
+          options={{
+            headerShown: true,
+            title: "plaka detay",
+            headerTintColor: "#4EE6AA",
+            headerTitleStyle: {
+              color: "#000",
+            },
+            headerBackTitle: "ana sayfa",
+          }}
+          name="PlakaDetay"
+          component={Plate}
+        />
+      </HomeStack.Navigator>
+    );
+  };
+
   if (auth?.isAuthorized) {
     return (
       <NormalTab.Navigator
@@ -132,6 +134,18 @@ const Nav = () => {
           tabBarShowLabel: false,
           tabBarInactiveTintColor: "#d5d5d5",
           headerShown: false,
+          tabBarStyle: {
+            position: "absolute",
+            bottom: 25,
+            left: 16,
+            right: 16,
+            elevation: 0,
+            height: 60,
+            backgroundColor: "#fff",
+            borderRadius: 16,
+            paddingBottom: 0,
+            borderTopWidth: 0,
+          },
         }}
         initialRouteName="ana sayfa"
       >
@@ -141,7 +155,7 @@ const Nav = () => {
               <Icon
                 type="ionicon"
                 name={focused ? "home" : "home-outline"}
-                size={30}
+                size={28}
                 color={color}
               />
             ),
@@ -156,7 +170,7 @@ const Nav = () => {
               <Icon
                 type="ionicon"
                 name={focused ? "add-circle" : "add"}
-                size={33}
+                size={36}
                 color={color}
               />
             ),
@@ -170,7 +184,7 @@ const Nav = () => {
               <Icon
                 type="ionicon"
                 name={focused ? "person-circle" : "person-circle-outline"}
-                size={33}
+                size={36}
                 color={color}
               />
             ),
@@ -182,7 +196,7 @@ const Nav = () => {
     );
   } else {
     return (
-      <AuthStack.Navigator screenOptions={{ headerShown: true }}>
+      <AuthStack.Navigator>
         <AuthStack.Screen
           name="Welcome"
           options={{ headerShown: false }}

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { Button, Container, Input } from "../components";
 
-import Input from "../components/input";
-import Container from "../components/container";
 import { firestore } from "../utils/firebase";
 import { useAuth } from "../context/auth";
-import { Button } from "../components/button";
+
+import PlateCheck from "../utils/plateCheck";
 
 const AddComment = () => {
   const [plaka, setPlaka] = useState<string>("");
@@ -15,14 +15,24 @@ const AddComment = () => {
   const auth = useAuth();
 
   const handleSubmit = () => {
-    if (plaka.length < 7 || plaka.length > 9) {
-      Alert.alert(
-        "hatalı plaka",
-        "lütfen doğru plakayı girdiğinize emin olun.",
-        [{ text: "tamam" }]
-      );
+    let plate = plaka;
+    const result = PlateCheck(plate);
+    if (!result.result) {
+      alert(result.error);
       return;
     }
+    const trMap: { [key: string]: string } = {
+      çÇ: "c",
+      ğĞ: "g",
+      şŞ: "s",
+      üÜ: "u",
+      ıİ: "i",
+      öÖ: "o",
+    };
+    for (const key in trMap) {
+      plate = plate.replace(new RegExp("[" + key + "]", "g"), trMap[key]);
+    }
+
     if (yorum.length < 6 || plaka.length > 255) {
       Alert.alert(
         "eksik/fazla karakter",
@@ -31,10 +41,11 @@ const AddComment = () => {
       );
       return;
     }
+
     setLoading(true);
     firestore()
       .collection("plates")
-      .doc(plaka.toLowerCase())
+      .doc(plaka.toUpperCase())
       .collection("comments")
       .add({
         comment: yorum,
@@ -47,7 +58,7 @@ const AddComment = () => {
       .then((result) => {
         firestore()
           .collection("plates")
-          .doc(plaka.toLowerCase())
+          .doc(plaka.toUpperCase())
           .set(
             {
               commentCount: firestore.FieldValue.increment(1),

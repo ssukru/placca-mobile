@@ -8,8 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { CommentNoTouch } from "../components/comment";
-import { ContainerWithoutSafeArea } from "../components/container";
+import { CommentNoTouch, ContainerWithoutSafeArea } from "../components";
 import { ProfileStackParams } from "../navigation";
 import { firestore } from "../utils/firebase";
 
@@ -48,7 +47,7 @@ const Plate = ({ navigation, route }: Props) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const plateRef = firestore().collection("plates").doc(plate.toLowerCase());
+    const plateRef = firestore().collection("plates").doc(plate.toUpperCase());
     plateRef.get().then((plateData) => {
       if (plateData.exists) {
         setPlateDetails({
@@ -89,7 +88,7 @@ const Plate = ({ navigation, route }: Props) => {
   }, [plate]);
 
   return (
-    <ContainerWithoutSafeArea>
+    <ContainerWithoutSafeArea paddingHorizontal={14}>
       <View style={styles.container}>
         {loading ? (
           <ActivityIndicator />
@@ -97,7 +96,7 @@ const Plate = ({ navigation, route }: Props) => {
           <>
             <Text style={styles.plateText}>{plateDetails?.plate}</Text>
             <Text style={styles.commentCount}>
-              toplam {plateDetails?.commentCount} yorum bulundu.
+              toplam {plateDetails?.commentCount} yorum bulundu
             </Text>
             <FlatList
               keyExtractor={(item) => item.commentId}
@@ -128,16 +127,18 @@ const styles = StyleSheet.create({
   plateText: {
     fontSize: 36,
     fontWeight: "bold",
+    marginLeft: 2,
   },
   flatList: {
     height: "100%",
     width: "100%",
-    paddingHorizontal: 1,
+    paddingHorizontal: 2,
   },
   commentCount: {
     marginTop: 8,
     marginBottom: 4,
-    color: "#159965",
+    color: "#4EE6AA",
+    marginLeft: 2,
   },
   container: {
     width: "100%",
@@ -147,5 +148,6 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     fontWeight: "300",
+    marginLeft: 2,
   },
 });

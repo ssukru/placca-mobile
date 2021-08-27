@@ -2,11 +2,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { CheckBox } from "react-native-elements";
-import { Button } from "../components/button";
-import { ContainerWithoutSafeArea } from "../components/container";
-import Input from "../components/input";
 import { useAuth } from "../context/auth";
 import { ProfileStackParams } from "../navigation";
+import { ContainerWithoutSafeArea, Input, Button } from "../components";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   ProfileStackParams,
@@ -24,16 +22,6 @@ const Register = ({ navigation }: Props) => {
   const [name, setName] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [linkComments, setLinkComments] = useState<boolean>(false);
-
-  /**
- * <ProgressBar
-          width={"100%"}
-          value={"70%"}
-          fillColor="#4EE6AA"
-          baseColor="#99ffd7"
-          marginB={16}
-        />
- */
 
   const auth = useAuth();
 
@@ -56,7 +44,7 @@ const Register = ({ navigation }: Props) => {
   };
 
   return (
-    <ContainerWithoutSafeArea>
+    <ContainerWithoutSafeArea useBottomTabHeight={false}>
       <View style={styles.container}>
         <Input
           placeholder="email"

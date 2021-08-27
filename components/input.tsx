@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: "#fff",
     width: "100%",
-    borderRadius: 4,
+    borderRadius: 8,
     marginBottom: 12,
     justifyContent: "center",
   },

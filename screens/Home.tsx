@@ -6,13 +6,12 @@ import {
   Text,
   View,
 } from "react-native";
-import Container from "../components/container";
-import Input from "../components/input";
-import Comment from "../components/comment";
+import { Comment, Container, Input } from "../components";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParams } from "../navigation";
 import { firestore } from "../utils/firebase";
 import { useAuth } from "../context/auth";
+import PlateCheck from "../utils/plateCheck";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParams,
@@ -42,11 +41,10 @@ const Home = ({ navigation }: Props) => {
 
   useEffect((): (() => void) => {
     let mounted = true;
-
     if (mounted && !auth?.authLoading) {
       firestore()
         .collectionGroup("comments")
-        .limit(10)
+        .limit(20)
         .orderBy("time", "desc")
         .onSnapshot((result) => {
           if (result.size > 0) {
@@ -64,6 +62,8 @@ const Home = ({ navigation }: Props) => {
             });
             setComments(tempComments);
             setLoading(false);
+          } else {
+            setLoading(false);
           }
         });
     }
@@ -72,14 +72,32 @@ const Home = ({ navigation }: Props) => {
   }, []);
 
   const Search = () => {
+    let plate = plaka;
+    const result = PlateCheck(plate);
+    if (!result.result) {
+      alert(result.error);
+      return;
+    }
+    const trMap: { [key: string]: string } = {
+      çÇ: "c",
+      ğĞ: "g",
+      şŞ: "s",
+      üÜ: "u",
+      ıİ: "i",
+      öÖ: "o",
+    };
+    for (const key in trMap) {
+      plate = plate.replace(new RegExp("[" + key + "]", "g"), trMap[key]);
+    }
+
     navigation.navigate("PlakaDetay", {
-      plate: plaka.toUpperCase(),
+      plate: plate.toUpperCase(),
     });
     setPlaka("");
   };
 
   return (
-    <Container>
+    <Container paddingHorizontal={14}>
       <Input
         capitalize
         placeholder="plaka ara"
@@ -88,11 +106,20 @@ const Home = ({ navigation }: Props) => {
         isMultiline={false}
         returnButtonType="send"
         onSubmit={Search}
+        additionalViewStyle={{ marginLeft: 2, marginRight: 2 }}
       />
       <View style={{ width: "100%" }}>
-        <Text style={styles.commentCount}>son eklenen yorumlar</Text>
+        <Text style={styles.commentCount}>
+          {loading
+            ? "yorumlar yükleniyor"
+            : comments.length < 1
+            ? "hiç yorum bulunamadı, wow."
+            : "son eklenen yorumlar"}
+        </Text>
         {loading ? (
           <ActivityIndicator />
+        ) : comments.length < 1 ? (
+          <></>
         ) : (
           <FlatList
             style={styles.flatList}
@@ -102,7 +129,7 @@ const Home = ({ navigation }: Props) => {
               <Comment
                 onPress={() =>
                   navigation.navigate("PlakaDetay", {
-                    plate: item.plate,
+                    plate: item.plate.toUpperCase(),
                   })
                 }
                 yorum={item.comment}
@@ -121,13 +148,14 @@ export default Home;
 
 const styles = StyleSheet.create({
   commentCount: {
+    marginLeft: 2,
     marginTop: 8,
     marginBottom: 4,
     color: "#4EE6AA",
   },
   flatList: {
-    height: "100%",
     width: "100%",
-    paddingHorizontal: 1,
+    height: "100%",
+    paddingHorizontal: 2,
   },
 });

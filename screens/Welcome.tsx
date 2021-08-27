@@ -5,10 +5,9 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { Button, TextButton } from "../components/button";
+import { Button, TextButton } from "../components";
 import { useAuth } from "../context/auth";
 import { AuthStackParams } from "../navigation";
 

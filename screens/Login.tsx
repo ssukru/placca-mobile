@@ -1,9 +1,6 @@
-import React from "react";
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Button } from "../components/button";
-import { ContainerWithoutSafeArea } from "../components/container";
-import Input from "../components/input";
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { Button, ContainerWithoutSafeArea, Input } from "../components";
 import { useAuth } from "../context/auth";
 
 const Login = () => {
@@ -22,10 +19,22 @@ const Login = () => {
   };
 
   return (
-    <ContainerWithoutSafeArea>
+    <ContainerWithoutSafeArea useBottomTabHeight={false}>
       <View style={styles.container}>
-        <Input placeholder="email" value={email} onChangeText={setEmail} />
-        <Input placeholder="şifre" secret value={pw} onChangeText={setPw} />
+        <Input
+          placeholder="email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          returnButtonType="next"
+        />
+        <Input
+          placeholder="şifre"
+          returnButtonType="send"
+          secret
+          value={pw}
+          onChangeText={setPw}
+        />
         <Button
           text="giriş yap"
           onPress={handleLogin}

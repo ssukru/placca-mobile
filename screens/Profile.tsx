@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   FlatList,
   Image,
   StyleSheet,
@@ -9,8 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Comment from "../components/comment";
-import { ContainerWithoutSafeArea } from "../components/container";
+import { ContainerWithoutSafeArea, Comment } from "../components";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackParams } from "../navigation";
 import { useAuth } from "../context/auth";
@@ -39,7 +37,7 @@ const Profile = ({ navigation }: Props) => {
   const auth = useAuth();
 
   const [comments, setComments] = useState<Array<MyComment>>([]);
-  const [commentLoading, setCommentLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect((): (() => void) => {
     let mounted = true;
@@ -66,7 +64,7 @@ const Profile = ({ navigation }: Props) => {
             });
             setComments(tempComments);
           }
-          setCommentLoading(false);
+          setLoading(false);
         });
     }
 
@@ -74,7 +72,7 @@ const Profile = ({ navigation }: Props) => {
   }, []);
 
   return (
-    <ContainerWithoutSafeArea>
+    <ContainerWithoutSafeArea paddingHorizontal={14}>
       <View style={styles.mainContainer}>
         {auth?.user?.isAnonymous ? (
           <View style={styles.anonContainer}>
@@ -111,11 +109,13 @@ const Profile = ({ navigation }: Props) => {
               </View>
             </View>
             <Text style={styles.commentCount}>
-              {!commentLoading && comments.length < 1
-                ? "Hiç yorum bulunamadı"
-                : `${auth?.user?.addedCommentsCount?.toString()} adet yorum bulundu:`}
+              {loading
+                ? "yorumlar yükleniyor"
+                : comments.length < 1
+                ? "hiç yorum bulunamadı"
+                : `${auth?.user?.addedCommentsCount?.toString()} adet yorum bulundu`}
             </Text>
-            {commentLoading ? (
+            {loading ? (
               <ActivityIndicator />
             ) : comments.length < 1 ? (
               <></>
@@ -128,7 +128,7 @@ const Profile = ({ navigation }: Props) => {
                   <Comment
                     onPress={() =>
                       navigation.navigate("PlakaDetay", {
-                        plate: item.plate,
+                        plate: item.plate.toUpperCase(),
                       })
                     }
                     yorum={item.comment}
@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     marginBottom: 16,
+    paddingHorizontal: 2,
   },
   mainContainer: {
     width: "100%",
@@ -170,11 +171,12 @@ const styles = StyleSheet.create({
   flatList: {
     height: "100%",
     width: "100%",
-    paddingHorizontal: 1,
+    paddingHorizontal: 2,
   },
   commentCount: {
     marginBottom: 4,
-    color: "#159965",
+    color: "#4EE6AA",
+    marginLeft: 2,
   },
   registerLink: {
     marginVertical: 6,

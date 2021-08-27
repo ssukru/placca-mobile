@@ -18,7 +18,7 @@ const Comment = ({ plaka, yorumcu, yorum, onPress }: Yorum) => {
     <TouchableOpacity style={styles.yorumBackground} onPress={onPress}>
       <View style={styles.commentUpSection}>
         <Text style={styles.commenter}>{yorumcu}</Text>
-        <Text style={styles.plateText}>@{plaka}</Text>
+        <Text style={styles.plateText}>@{plaka.toUpperCase()}</Text>
       </View>
 
       <Text numberOfLines={4} style={styles.commentText}>
@@ -42,17 +42,18 @@ export const CommentNoTouch = ({ yorum, yorumcu }: YorumNoTouch) => {
 const styles = StyleSheet.create({
   yorumBackground: {
     width: "100%",
-    borderRadius: 4,
+    borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 10,
-    marginTop: 6,
+    marginTop: 4,
+    marginBottom: 4,
     backgroundColor: "#f7f7f7",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.22,
+    shadowOpacity: 0.12,
     shadowRadius: 2.22,
 
     elevation: 3,
