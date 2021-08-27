@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React from "react";
 import {
   Keyboard,
@@ -13,11 +14,37 @@ const DismissKeyboard: React.FC = ({ children }) => (
   </TouchableWithoutFeedback>
 );
 
-const Container: React.FC = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+  paddingHorizontal?: number;
+  paddingVertical?: number;
+  useBottomTabHeight?: boolean;
+};
+const Container = ({
+  children,
+  paddingHorizontal = 16,
+  paddingVertical = 16,
+  useBottomTabHeight = true,
+}: Props) => {
+  const tabBarHeight = useBottomTabHeight
+    ? useBottomTabBarHeight() * 2 + 24
+    : 0;
+
   return (
     <SafeAreaView>
       <DismissKeyboard>
-        <View style={styles.container}>{children}</View>
+        <View
+          style={[
+            styles.container,
+            {
+              paddingHorizontal: paddingHorizontal,
+              paddingVertical: paddingVertical,
+              paddingBottom: tabBarHeight,
+            },
+          ]}
+        >
+          {children}
+        </View>
       </DismissKeyboard>
     </SafeAreaView>
   );
@@ -25,17 +52,34 @@ const Container: React.FC = ({ children }) => {
 
 export default Container;
 
-export const ContainerWithoutSafeArea: React.FC = ({ children }) => {
+export const ContainerWithoutSafeArea = ({
+  children,
+  paddingHorizontal = 16,
+  paddingVertical = 16,
+  useBottomTabHeight = true,
+}: Props) => {
+  const tabBarHeight = useBottomTabHeight ? useBottomTabBarHeight() + 32 : 0;
+
   return (
     <DismissKeyboard>
-      <View style={styles.container}>{children}</View>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingHorizontal: paddingHorizontal,
+            paddingVertical: paddingVertical,
+            paddingBottom: tabBarHeight,
+          },
+        ]}
+      >
+        {children}
+      </View>
     </DismissKeyboard>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     height: "100%",
     alignItems: "center",
   },

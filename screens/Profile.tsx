@@ -1,30 +1,18 @@
-import React from "react";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
-import Comment from "../components/comment";
-import { ContainerWithoutSafeArea } from "../components/container";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { ContainerWithoutSafeArea, Comment } from "../components";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ProfileStackParams } from "../navigation";
-
-const Redirect = () => {
-  return;
-};
-
-const data = [
-  {
-    id: "1",
-    onPress: Redirect,
-    plaka: "48AGB465",
-    yorumcu: "ŞÜKRÜ ÜNAL",
-    yorum: "ne kadar duyarlı bir sürücü 🥰",
-  },
-  {
-    id: "2",
-    onPress: Redirect,
-    plaka: "15HC959",
-    yorumcu: "ŞÜKRÜ ÜNAL",
-    yorum: "araba yavaş gidiyo sanki biraz?",
-  },
-];
+import { useAuth } from "../context/auth";
+import { firestore } from "../utils/firebase";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   ProfileStackParams,
@@ -35,34 +23,123 @@ type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
+type MyComment = {
+  commentId: string;
+  comment: string;
+  commenterName: string;
+  commenterUid: string;
+  plate: string;
+  time: string;
+  isAnonymous: boolean;
+};
+
 const Profile = ({ navigation }: Props) => {
+  const auth = useAuth();
+
+  const [comments, setComments] = useState<Array<MyComment>>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect((): (() => void) => {
+    let mounted = true;
+
+    if (mounted && !auth?.user?.isAnonymous && !auth?.authLoading) {
+      firestore()
+        .collectionGroup("comments")
+        .limit(10)
+        .orderBy("time", "desc")
+        .where("commenterUid", "==", auth?.user?.uid)
+        .onSnapshot((result) => {
+          if (result.size > 0) {
+            let tempComments: Array<MyComment> = [];
+            result.forEach((doc) => {
+              tempComments.push({
+                commentId: doc.id,
+                comment: doc.data().comment,
+                commenterName: doc.data().commenterName,
+                commenterUid: doc.data().commenterUid,
+                plate: doc.data().plate,
+                time: doc.data().time.toString(),
+                isAnonymous: doc.data().isAnonymous,
+              });
+            });
+            setComments(tempComments);
+          }
+          setLoading(false);
+        });
+    }
+
+    return () => (mounted = false);
+  }, []);
+
   return (
-    <ContainerWithoutSafeArea>
-      <View style={{ width: "100%", height: "100%" }}>
-        <View style={styles.head}>
-          <Image
-            source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
-            style={{ height: 64, width: 64, marginRight: 12 }}
-          />
-          <View style={{ flexDirection: "column" }}>
-            <Text style={styles.text}>Şükrü Ünal</Text>
-            <Text style={{ marginTop: 2 }}>Denizli</Text>
+    <ContainerWithoutSafeArea paddingHorizontal={14}>
+      <View style={styles.mainContainer}>
+        {auth?.user?.isAnonymous ? (
+          <View style={styles.anonContainer}>
+            <Text style={styles.anonDesc}>
+              anonim olduğunuz için profil sayfasında görüntülenecek içerik yok.
+              dilerseniz hesap oluşturup profil sayfanızı
+              kişiselleştirebilirsiniz.
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Kayit");
+              }}
+            >
+              <Text style={styles.registerLink}>kayıt sayfasına git →</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-        <Text>2 adet yorum bulundu:</Text>
-        <FlatList
-          style={{ height: "100%", width: "100%", paddingHorizontal: 1 }}
-          data={data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Comment
-              onPress={() => navigation.navigate("PlakaDetay")}
-              yorum={item.yorum}
-              yorumcu={item.yorumcu}
-              plaka={item.plaka}
-            />
-          )}
-        />
+        ) : (
+          <>
+            <View style={styles.head}>
+              <Image
+                source={
+                  auth?.user?.photoUrl === ""
+                    ? require("../assets/pp.png")
+                    : {
+                        uri: auth?.user?.photoUrl,
+                      }
+                }
+                style={styles.profilePicture}
+              />
+              <View style={{ flexDirection: "column" }}>
+                <Text style={styles.text}>{auth?.user?.name}</Text>
+                <Text style={{ marginTop: 2 }}>{auth?.user?.city}</Text>
+              </View>
+            </View>
+            <Text style={styles.commentCount}>
+              {loading
+                ? "yorumlar yükleniyor"
+                : comments.length < 1
+                ? "hiç yorum bulunamadı"
+                : `${auth?.user?.addedCommentsCount?.toString()} adet yorum bulundu`}
+            </Text>
+            {loading ? (
+              <ActivityIndicator />
+            ) : comments.length < 1 ? (
+              <></>
+            ) : (
+              <FlatList
+                style={styles.flatList}
+                data={comments}
+                keyExtractor={(item) => item.commentId}
+                renderItem={({ item }) => (
+                  <Comment
+                    onPress={() =>
+                      navigation.navigate("PlakaDetay", {
+                        plate: item.plate.toUpperCase(),
+                      })
+                    }
+                    yorum={item.comment}
+                    yorumcu={item.commenterName}
+                    plaka={item.plate}
+                  />
+                )}
+              />
+            )}
+          </>
+        )}
       </View>
     </ContainerWithoutSafeArea>
   );
@@ -74,10 +151,49 @@ const styles = StyleSheet.create({
   head: {
     width: "100%",
     flexDirection: "row",
-    marginBottom: 24,
+    marginBottom: 16,
+    paddingHorizontal: 2,
+  },
+  mainContainer: {
+    width: "100%",
+    height: "100%",
   },
   text: {
     fontSize: 16,
     fontWeight: "500",
+  },
+  profilePicture: {
+    height: 64,
+    width: 64,
+    marginRight: 12,
+    borderRadius: 4,
+  },
+  flatList: {
+    height: "100%",
+    width: "100%",
+    paddingHorizontal: 2,
+  },
+  commentCount: {
+    marginBottom: 4,
+    color: "#4EE6AA",
+    marginLeft: 2,
+  },
+  registerLink: {
+    marginVertical: 6,
+    fontWeight: "500",
+    fontSize: 16,
+    color: "#4EE6AA",
+  },
+  anonDesc: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#444",
+  },
+  anonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
   },
 });

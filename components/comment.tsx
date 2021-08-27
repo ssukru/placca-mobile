@@ -16,28 +16,12 @@ type YorumNoTouch = {
 const Comment = ({ plaka, yorumcu, yorum, onPress }: Yorum) => {
   return (
     <TouchableOpacity style={styles.yorumBackground} onPress={onPress}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>
-          {yorumcu}
-        </Text>
-        <Text style={{ color: "#159965", fontWeight: "500" }}>@{plaka}</Text>
+      <View style={styles.commentUpSection}>
+        <Text style={styles.commenter}>{yorumcu}</Text>
+        <Text style={styles.plateText}>@{plaka.toUpperCase()}</Text>
       </View>
 
-      <Text
-        numberOfLines={4}
-        style={{
-          marginTop: 6,
-          fontSize: 14,
-          fontStyle: "italic",
-          color: "#333",
-        }}
-      >
+      <Text numberOfLines={4} style={styles.commentText}>
         {yorum}
       </Text>
     </TouchableOpacity>
@@ -49,28 +33,8 @@ export default Comment;
 export const CommentNoTouch = ({ yorum, yorumcu }: YorumNoTouch) => {
   return (
     <View style={styles.yorumBackground}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text style={{ fontSize: 16, fontWeight: "500", color: "#000" }}>
-          {yorumcu}
-        </Text>
-      </View>
-
-      <Text
-        style={{
-          marginTop: 6,
-          fontSize: 14,
-          fontStyle: "italic",
-          color: "#333",
-        }}
-      >
-        {yorum}
-      </Text>
+      <Text style={styles.commenter}>{yorumcu}</Text>
+      <Text style={styles.commentText}>{yorum}</Text>
     </View>
   );
 };
@@ -78,19 +42,39 @@ export const CommentNoTouch = ({ yorum, yorumcu }: YorumNoTouch) => {
 const styles = StyleSheet.create({
   yorumBackground: {
     width: "100%",
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 10,
-    marginTop: 6,
+    marginTop: 4,
+    marginBottom: 4,
     backgroundColor: "#f7f7f7",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.22,
+    shadowOpacity: 0.12,
     shadowRadius: 2.22,
 
     elevation: 3,
+  },
+  commentText: {
+    marginTop: 6,
+    fontSize: 14,
+    color: "#444",
+  },
+  commenter: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#000",
+  },
+  plateText: {
+    color: "#4EE6AA",
+    fontWeight: "500",
+  },
+  commentUpSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
